@@ -22,7 +22,7 @@
     "phpbb/epv": "dev-master"
   },
   "extra": {
-    "display-name": "Loginza authorization",
+    "display-name": "Loginza auth",
     "soft-require": {
       "phpbb/phpbb": "~3.2"
     }

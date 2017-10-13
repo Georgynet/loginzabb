@@ -1,0 +1,16 @@
+li.rightside.loginza {
+    margin: -3px 0 0;
+}
+
+.loginza-ucp {
+    float: left;
+    margin-right: 50px;
+    background-color: #fff;
+    padding: 5px 20px;
+    border: 1px solid #ddd;
+}
+
+.loginza-ucp frame {
+    width: 359px;
+    height: 200px;
+}
