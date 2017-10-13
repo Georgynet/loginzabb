@@ -1,0 +1,30 @@
+{
+  "name": "georgynet/loginzabb",
+  "type": "phpbb-extension",
+  "description": "Loginza for phpBB 3.2",
+  "homepage": "https://github.com/georgynet/loginzabb",
+  "version": "0.1.0",
+  "time": "2017-10-13",
+  "keywords": ["phpbb", "extension", "loginza", "social", "oauth"],
+  "license": "GPL-2.0",
+  "authors": [
+    {
+      "name": "Georg",
+      "email": "georgynet@gmail.com",
+      "homepage": "https://github.com/georgynet"
+    }
+  ],
+  "require": {
+    "php": ">=5.4.0",
+    "composer/installers": "~1.0"
+  },
+  "require-dev": {
+    "phpbb/epv": "dev-master"
+  },
+  "extra": {
+    "display-name": "Loginza authorization",
+    "soft-require": {
+      "phpbb/phpbb": "~3.2"
+    }
+  }
+}
