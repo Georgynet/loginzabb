@@ -1,0 +1,19 @@
+services:
+  georgynet.loginzabb.listener:
+    class: georgynet\loginzabb\event\listener
+    arguments:
+      - '@template'
+      - '@controller.helper'
+    tags:
+      - { name: event.listener }
+
+  georgynet.loginzabb.auth:
+    class: georgynet\loginzabb\controller\auth
+    arguments:
+      - '@config'
+      - '@user'
+      - '@request'
+      - '@template'
+      - '@dbal.conn'
+      - '%core.root_path%'
+      - '%core.php_ext%'

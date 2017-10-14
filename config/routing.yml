@@ -1,0 +1,3 @@
+georgynet_loginzabb_auth:
+    path: /loginza/auth
+    defaults: { _controller: georgynet.loginzabb.auth:handle }
