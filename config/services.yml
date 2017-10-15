@@ -15,5 +15,6 @@ services:
       - '@request'
       - '@template'
       - '@dbal.conn'
+      - '@passwords.manager'
       - '%core.root_path%'
       - '%core.php_ext%'
