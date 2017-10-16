@@ -122,8 +122,6 @@ class auth
     {
         $loginzaProfile = new LoginzaUserProfile($profile);
 
-        $timezone = $this->getTimezone();
-
         $newPassword = $loginzaProfile->genRandomPassword();
 
         $data = [
@@ -133,7 +131,7 @@ class auth
             'user_birthday' => date('d-m-Y', strtotime($profile->dob)),
             'user_avatar' => (string) $profile->photo,
             'user_jabber' => (string) $profile->im->jabber,
-            'user_timezone' => (float) $timezone,
+            'user_timezone' => (float) $this->getTimezone(),
             'user_lang' => basename($this->user->lang_name),
             'user_type' => USER_NORMAL,
             'user_actkey' => '',
@@ -145,37 +143,18 @@ class auth
             'loginza_provider' => $profile->provider
         ];
 
-        $usernameErrors = $this->validateData($data);
-        if (count($usernameErrors)) {
-            $result = $this->db->sql_query("
-				SELECT count(`user_id`) AS `count`
-				FROM `" . USERS_TABLE . "`
-				WHERE 1
-			");
-            $row = $this->db->sql_fetchrow($result);
-            $this->db->sql_freeresult($result);
-
-            $data['username'] = LOGINZA_REGISTER_DEFAULT_LOGIN_PREFIX . $row['count'];
-        }
+        $data['username'] = $this->getValidUsername($data);
 
         $error = $this->checkDnsbl();
         if (count($error)) {
             trigger_error(implode('', $error));
         }
 
-        $sql = 'SELECT group_id
-            FROM ' . GROUPS_TABLE . "
-            WHERE group_name = '" . $this->db->sql_escape('REGISTERED') . "'
-                AND group_type = " . GROUP_SPECIAL;
-        $result = $this->db->sql_query($sql);
-        $row = $this->db->sql_fetchrow($result);
-        $this->db->sql_freeresult($result);
-
-        if (!$row) {
+        $groupId = $this->getGroupIdRegisteredUsers();
+        if (!$groupId) {
             trigger_error('NO_GROUP');
         }
-
-        $data['group_id'] = (int) $row['group_id'];
+        $data['group_id'] = $groupId;
 
         if ($this->config['new_member_post_limit']) {
             $data['user_new'] = 1;
@@ -192,23 +171,36 @@ class auth
     }
 
     /**
-     * Validate data.
+     * Get valid username.
      * @param array $data
-     * @return array
+     * @return string
      */
-    private function validateData($data)
+    private function getValidUsername($data)
     {
         if (!function_exists('validate_data')) {
             require_once($this->phpbbRootPath . 'includes/functions_user.' . $this->phpExt);
         }
 
-        $username_errors = validate_data($data, [
+        $error = validate_data($data, [
             'username' => [
                 ['string', false, $this->config['min_name_chars'], $this->config['max_name_chars']],
                 ['username', '']
             ]
         ]);
-        return $username_errors;
+
+        if (!count($error)) {
+            return $data['username'];
+        }
+        
+        $result = $this->db->sql_query("
+            SELECT count(`user_id`) AS `count`
+            FROM `" . USERS_TABLE . "`
+            WHERE 1
+        ");
+        $row = $this->db->sql_fetchrow($result);
+        $this->db->sql_freeresult($result);
+
+        return LOGINZA_REGISTER_DEFAULT_LOGIN_PREFIX . $row['count'];
     }
 
     /**
@@ -281,5 +273,22 @@ class auth
 
             $messenger->send(NOTIFY_EMAIL);
         }
+    }
+
+    /**
+     * Return id group registered users.
+     * @return int|false
+     */
+    private function getGroupIdRegisteredUsers()
+    {
+        $sql = 'SELECT group_id
+            FROM ' . GROUPS_TABLE . "
+            WHERE group_name = '" . $this->db->sql_escape('REGISTERED') . "'
+                AND group_type = " . GROUP_SPECIAL;
+        $result = $this->db->sql_query($sql);
+        $row = $this->db->sql_fetchrow($result);
+        $this->db->sql_freeresult($result);
+
+        return isset($row['group_id']) ? (int) $row['group_id'] : false;
     }
 }
