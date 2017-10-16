@@ -13,6 +13,7 @@ use georgynet\loginzabb\model\LoginzaUserProfile;
 use messenger;
 use phpbb\db\driver\driver_interface;
 use phpbb\config\config;
+use phpbb\install\console\command\update\config\validate;
 use phpbb\passwords\manager;
 use phpbb\request\request;
 use phpbb\request\request_interface;

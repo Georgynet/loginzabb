@@ -2,13 +2,6 @@
 
 namespace georgynet\loginzabb\model;
 
-/**
- * Класса работы с Loginza API (http://loginza.ru/api-overview).
- *
- * @link http://loginza.ru/api-overview
- * @author Sergey Arsenichev, PRO-Technologies Ltd.
- * @version 1.0
- */
 class LoginzaAPI
 {
     /**
@@ -28,7 +21,7 @@ class LoginzaAPI
      */
     public function getAuthInfo($token)
     {
-        return $this->apiRequert('authinfo', [
+        return $this->apiRequest('authinfo', [
             'token' => $token]
         );
     }
@@ -101,44 +94,17 @@ class LoginzaAPI
      * @param array $params
      * @return string
      */
-    private function apiRequert($method, $params)
+    private function apiRequest($method, $params)
     {
-        $url = str_replace('%method%', $method, self::API_URL) . '?' . http_build_query($params);
+        $url = str_replace('%method%', $method, self::API_URL);
 
-        if (function_exists('curl_init')) {
-            $curl = curl_init($url);
-            $user_agent = 'LoginzaAPI' . '/php' . phpversion();
+        $client = new \GuzzleHttp\Client();
+        $res = $client->get($url, [
+            'query' => $params
+        ]);
 
-            curl_setopt($curl, CURLOPT_RETURNTRANSFER, true);
-            curl_setopt($curl, CURLOPT_HEADER, false);
-            curl_setopt($curl, CURLOPT_USERAGENT, $user_agent);
-            curl_setopt($curl, CURLOPT_SSL_VERIFYPEER, false);
-            $raw_data = curl_exec($curl);
-            curl_close($curl);
-            $response = $raw_data;
-        } else {
-            $response = file_get_contents($url);
-        }
-
-
-        return json_decode($response);
-    }
-
-    public function debugPrint($responseData, $recursive = false)
-    {
-        if (!$recursive) {
-            echo "<h3>Debug print:</h3>";
-        }
-        echo "<table border>";
-        foreach ($responseData as $key => $value) {
-            if (!is_array($value) && !is_object($value)) {
-                echo "<tr><td>$key</td> <td><b>$value</b></td></tr>";
-            } else {
-                echo "<tr><td>$key</td> <td>";
-                $this->debugPrint($value, true);
-                echo "</td></tr>";
-            }
-        }
-        echo "</table>";
+        return $res->json([
+            'object' => true
+        ]);
     }
 }
