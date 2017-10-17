@@ -43,16 +43,20 @@ class LoginzaUserProfile
         $this->profile = $profile;
     }
 
-    public function genNickname()
+    public function getNickname()
     {
         if ($this->profile->nickname) {
             return $this->profile->nickname;
-        } elseif (!empty($this->profile->email) && preg_match('/^(.+)\@/i', $this->profile->email, $nickname)) {
-            return $nickname[1];
-        } elseif (($fullname = $this->genFullName())) {
-            return $this->normalize($fullname, '.');
         }
-        // шаблоны по которым выцепляем ник из identity
+
+        if (!empty($this->profile->email) && preg_match('/^(.+)\@/i', $this->profile->email, $nickname)) {
+            return $nickname[1];
+        }
+
+        if (($fullName = $this->getFullName())) {
+            return $this->normalize($fullName, '.');
+        }
+
         $patterns = [
             '([^\.]+)\.ya\.ru',
             'openid\.mail\.ru\/[^\/]+\/([^\/?]+)',
@@ -73,18 +77,22 @@ class LoginzaUserProfile
     {
         if (!empty($this->profile->web->blog)) {
             return $this->profile->web->blog;
-        } elseif (!empty($this->profile->web->default)) {
+        }
+
+        if (!empty($this->profile->web->default)) {
             return $this->profile->web->default;
         }
 
         return $this->profile->identity;
     }
 
-    public function genDisplayName()
+    public function getDisplayName()
     {
-        if (($fullname = $this->genFullName())) {
-            return $fullname;
-        } elseif (($nickname = $this->genNickname())) {
+        if (($fullName = $this->getFullName())) {
+            return $fullName;
+        }
+
+        if (($nickname = $this->getNickname())) {
             return $nickname;
         }
 
@@ -99,11 +107,13 @@ class LoginzaUserProfile
 
     }
 
-    public function genFullName()
+    public function getFullName()
     {
         if ($this->profile->name->full_name) {
             return $this->profile->name->full_name;
-        } elseif ($this->profile->name->first_name || $this->profile->name->last_name) {
+        }
+
+        if ($this->profile->name->first_name || $this->profile->name->last_name) {
             return trim($this->profile->name->first_name . ' ' . $this->profile->name->last_name);
         }
 

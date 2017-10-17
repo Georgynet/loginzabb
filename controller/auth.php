@@ -126,7 +126,7 @@ class auth
         $newPassword = $loginzaProfile->genRandomPassword();
 
         $data = [
-            'username' => utf8_normalize_nfc($loginzaProfile->genNickname()),
+            'username' => utf8_normalize_nfc($loginzaProfile->getNickname()),
             'user_password' => $this->passManager->hash($newPassword),
             'user_email' => strtolower($profile->email),
             'user_birthday' => date('d-m-Y', strtotime($profile->dob)),
