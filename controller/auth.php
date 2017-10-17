@@ -22,6 +22,8 @@ use phpbb\user;
 
 class auth
 {
+    const LOGINZA_REGISTER_DEFAULT_LOGIN_PREFIX = 'loginza';
+
     /** @var config */
     private $config;
     /** @var user */
@@ -201,7 +203,7 @@ class auth
         $row = $this->db->sql_fetchrow($result);
         $this->db->sql_freeresult($result);
 
-        return LOGINZA_REGISTER_DEFAULT_LOGIN_PREFIX . $row['count'];
+        return self::LOGINZA_REGISTER_DEFAULT_LOGIN_PREFIX . $row['count'];
     }
 
     /**
